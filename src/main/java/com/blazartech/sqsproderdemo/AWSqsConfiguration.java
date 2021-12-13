@@ -8,6 +8,7 @@ import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.services.sqs.AmazonSQSAsync;
 import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.aws.messaging.config.SimpleMessageListenerContainerFactory;
 import org.springframework.cloud.aws.messaging.config.annotation.EnableSqs;
@@ -16,10 +17,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
- *
+ * configure SQS directly
  * @author aar1069
  */
 @Configuration
@@ -67,5 +69,10 @@ public class AWSqsConfiguration {
         threadPoolTaskExecutor.setQueueCapacity(2);
         threadPoolTaskExecutor.afterPropertiesSet();
         return threadPoolTaskExecutor;
+    }
+    
+    @Bean
+    public ObjectMapper objectMapper() {
+        return Jackson2ObjectMapperBuilder.json().build();
     }
 }

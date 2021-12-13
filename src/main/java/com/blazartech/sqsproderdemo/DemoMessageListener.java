@@ -7,26 +7,26 @@ package com.blazartech.sqsproderdemo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.aws.messaging.listener.SqsMessageDeletionPolicy;
 import org.springframework.cloud.aws.messaging.listener.annotation.SqsListener;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
-import org.springframework.stereotype.Component;
 
 /**
  *
  * @author aar1069
  */
-@Component
+//@Component
 @Slf4j
 public class DemoMessageListener {
     
-    private static final ObjectMapper OBJECT_MAPPER = Jackson2ObjectMapperBuilder.json().build();
+    @Autowired
+    private ObjectMapper objectMapper;
     
     @SqsListener(value = "${demo.queueName}", deletionPolicy = SqsMessageDeletionPolicy.ON_SUCCESS)
     public void processMessage(String message) {
         try {
             log.info("received message " + message);
-            DemoMessage demoMessage = OBJECT_MAPPER.readValue(message, DemoMessage.class);
+            DemoMessage demoMessage = objectMapper.readValue(message, DemoMessage.class);
             
             log.info("name = " + demoMessage.name());
             
