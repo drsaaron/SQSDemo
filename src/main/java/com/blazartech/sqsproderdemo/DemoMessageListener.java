@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.aws.messaging.listener.SqsMessageDeletionPolicy;
 import org.springframework.cloud.aws.messaging.listener.annotation.SqsListener;
 import org.springframework.context.annotation.Profile;
@@ -25,6 +26,9 @@ public class DemoMessageListener {
     @Autowired
     private ObjectMapper objectMapper;
     
+    @Value("${demo.doFail:false}")
+    private boolean doFail;
+    
     @SqsListener(value = "${demo.queueName}", deletionPolicy = SqsMessageDeletionPolicy.ON_SUCCESS)
     public void processMessage(String message) {
         try {
@@ -33,7 +37,7 @@ public class DemoMessageListener {
             
             log.info("name = " + demoMessage.name());
             
-            if (demoMessage.doFail()) {
+            if (doFail && demoMessage.doFail()) {
                 throw new RuntimeException("intentional fail as requested");
             } 
             
