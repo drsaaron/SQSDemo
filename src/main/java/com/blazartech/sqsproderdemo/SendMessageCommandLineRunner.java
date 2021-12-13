@@ -26,7 +26,7 @@ public class SendMessageCommandLineRunner implements CommandLineRunner {
     public void run(String... args) throws Exception {
         int count = 1;
         for (String name : args) {
-            DemoMessage message = new DemoMessage(count++, name, count % 4 == 0);
+            DemoMessage message = new DemoMessage(count, name, count++ % 4 == 0);
             
             Map<String, Object> headers = Map.of("Content-Type", MediaType.APPLICATION_JSON_VALUE);
             

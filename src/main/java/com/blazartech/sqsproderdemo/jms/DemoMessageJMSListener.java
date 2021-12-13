@@ -13,6 +13,7 @@ import javax.jms.MessageListener;
 import javax.jms.TextMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
@@ -28,6 +29,9 @@ public class DemoMessageJMSListener implements MessageListener {
 
     @Autowired
     private ObjectMapper objectMapper;
+    
+    @Value("${demo.doFail:false}")
+    private boolean doFail;
 
     @Override
     @JmsListener(destination = "${demo.queueName}")
@@ -40,7 +44,7 @@ public class DemoMessageJMSListener implements MessageListener {
 
                 log.info("name = " + demoMessage.name());
 
-                if (demoMessage.doFail()) {
+                if (doFail && demoMessage.doFail()) {
                     throw new RuntimeException("intentional fail as requested");
                 }
 

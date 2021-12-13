@@ -1,6 +1,6 @@
 #! /bin/sh
 
-while getopts :sj OPTION
+while getopts :sjf OPTION
 do
     case $OPTION in
 	s)
@@ -8,6 +8,9 @@ do
 	    ;;
 	j)
 	    profile=jms
+	    ;;
+	f)
+	    doFail=true
 	    ;;
 	*)
 	    echo "unknown option $OPTARG"
@@ -29,5 +32,5 @@ then
     exit 1
 fi
 
-java -Dspring.profiles.active=$profile -jar target/$(getPomAttribute.sh artifactId)-$(getPomAttribute.sh version).jar $*
+java -Ddemo.doFail=${doFail:-false} -Dspring.profiles.active=$profile -jar target/$(getPomAttribute.sh artifactId)-$(getPomAttribute.sh version).jar $*
 

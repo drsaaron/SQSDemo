@@ -35,6 +35,7 @@ public class SQSJMSConfiguration {
     @Autowired
     private ErrorHandler errorHandler;
     
+    @Bean
     public SQSConnectionFactory sqsConnectionFactory() {
         AmazonSQS sqs = AmazonSQSClientBuilder.standard()
                 .withRegion(region)
