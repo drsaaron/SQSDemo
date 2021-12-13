@@ -8,14 +8,16 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.aws.messaging.core.QueueMessagingTemplate;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 /**
  *
  * @author aar1069
  */
-//@Component
+@Component
 @Slf4j
+@Profile("sqs")
 public class SqsMessageProducerImpl implements SqsMessageProducer {
     
     private final QueueMessagingTemplate queueMessagingTemplate;
