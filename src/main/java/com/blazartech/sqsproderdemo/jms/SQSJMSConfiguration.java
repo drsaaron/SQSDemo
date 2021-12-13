@@ -6,6 +6,7 @@ package com.blazartech.sqsproderdemo.jms;
 
 import com.amazon.sqs.javamessaging.ProviderConfiguration;
 import com.amazon.sqs.javamessaging.SQSConnectionFactory;
+import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import javax.jms.Session;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.core.JmsTemplate;
@@ -27,6 +29,7 @@ import org.springframework.util.ErrorHandler;
 @EnableJms
 @Configuration
 @Slf4j
+@Profile("jms")
 public class SQSJMSConfiguration {
 
     @Value("${cloud.aws.region:us-east-2}")
@@ -35,10 +38,14 @@ public class SQSJMSConfiguration {
     @Autowired
     private ErrorHandler errorHandler;
     
+    @Autowired
+    private AWSCredentialsProvider credentialsProvider;
+    
     @Bean
     public SQSConnectionFactory sqsConnectionFactory() {
         AmazonSQS sqs = AmazonSQSClientBuilder.standard()
                 .withRegion(region)
+                .withCredentials(credentialsProvider)
                 .build();
         SQSConnectionFactory connectionFactory = new SQSConnectionFactory(
                 new ProviderConfiguration(),

@@ -2,13 +2,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.blazartech.sqsproderdemo;
+package com.blazartech.sqsproderdemo.sqs;
 
 import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.services.sqs.AmazonSQSAsync;
 import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.aws.messaging.config.SimpleMessageListenerContainerFactory;
 import org.springframework.cloud.aws.messaging.config.annotation.EnableSqs;
@@ -16,8 +15,8 @@ import org.springframework.cloud.aws.messaging.core.QueueMessagingTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.task.AsyncTaskExecutor;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
@@ -26,7 +25,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
  */
 @Configuration
 @EnableSqs
-public class AWSqsConfiguration {
+@Profile("sqs")
+public class AWSSqsConfiguration {
     
     @Value("${cloud.aws.region:us-east-2}")
     private String region;
@@ -35,16 +35,13 @@ public class AWSqsConfiguration {
     @Primary
     public AmazonSQSAsync amazonSQSAsync() {
         return AmazonSQSAsyncClientBuilder.standard()
-                .withCredentials(credentialsProvider())
+                .withCredentials(credentialsProvider)
                 .withRegion(region)
                 .build();
     }
     
-    @Bean
-    public AWSCredentialsProvider credentialsProvider() {
-        // get credentials from ~/.aws/credentials
-        return new DefaultAWSCredentialsProviderChain();
-    }
+    @Autowired
+    private AWSCredentialsProvider credentialsProvider;
     
     @Bean
     public QueueMessagingTemplate queueMessagingTemplate() {
@@ -70,9 +67,5 @@ public class AWSqsConfiguration {
         threadPoolTaskExecutor.afterPropertiesSet();
         return threadPoolTaskExecutor;
     }
-    
-    @Bean
-    public ObjectMapper objectMapper() {
-        return Jackson2ObjectMapperBuilder.json().build();
-    }
+
 }

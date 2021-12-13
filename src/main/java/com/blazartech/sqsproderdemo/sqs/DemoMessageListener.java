@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.blazartech.sqsproderdemo;
+package com.blazartech.sqsproderdemo.sqs;
 
+import com.blazartech.sqsproderdemo.MessageProcessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -24,26 +25,11 @@ import org.springframework.stereotype.Component;
 public class DemoMessageListener {
     
     @Autowired
-    private ObjectMapper objectMapper;
-    
-    @Value("${demo.doFail:false}")
-    private boolean doFail;
+    private MessageProcessor messageProcessor;
     
     @SqsListener(value = "${demo.queueName}", deletionPolicy = SqsMessageDeletionPolicy.ON_SUCCESS)
     public void processMessage(String message) {
-        try {
-            log.info("received message " + message);
-            DemoMessage demoMessage = objectMapper.readValue(message, DemoMessage.class);
-            
-            log.info("name = " + demoMessage.name());
-            
-            if (doFail && demoMessage.doFail()) {
-                throw new RuntimeException("intentional fail as requested");
-            } 
-            
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("error processing message: " + e.getMessage(), e);
-        }
+        messageProcessor.processMessage(message);
     }
     
 }

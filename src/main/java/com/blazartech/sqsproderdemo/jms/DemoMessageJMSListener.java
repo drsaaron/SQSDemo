@@ -4,16 +4,13 @@
  */
 package com.blazartech.sqsproderdemo.jms;
 
-import com.blazartech.sqsproderdemo.DemoMessage;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.blazartech.sqsproderdemo.MessageProcessor;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.TextMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
@@ -28,10 +25,7 @@ import org.springframework.stereotype.Component;
 public class DemoMessageJMSListener implements MessageListener {
 
     @Autowired
-    private ObjectMapper objectMapper;
-    
-    @Value("${demo.doFail:false}")
-    private boolean doFail;
+    private MessageProcessor messageProcessor;
 
     @Override
     @JmsListener(destination = "${demo.queueName}")
@@ -39,16 +33,8 @@ public class DemoMessageJMSListener implements MessageListener {
         if (msg instanceof TextMessage textMessage) {
             try {
                 String message = textMessage.getText();
-                log.info("received message " + message);
-                DemoMessage demoMessage = objectMapper.readValue(message, DemoMessage.class);
-
-                log.info("name = " + demoMessage.name());
-
-                if (doFail && demoMessage.doFail()) {
-                    throw new RuntimeException("intentional fail as requested");
-                }
-
-            } catch (JMSException | JsonProcessingException e) {
+                messageProcessor.processMessage(message);
+            } catch (JMSException e) {
                 throw new RuntimeException("error processing message: " + e.getMessage(), e);
             }
         }
