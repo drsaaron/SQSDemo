@@ -6,9 +6,6 @@ package com.blazartech.sqsproderdemo.jms;
 
 import com.amazon.sqs.javamessaging.ProviderConfiguration;
 import com.amazon.sqs.javamessaging.SQSConnectionFactory;
-import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.services.sqs.AmazonSQS;
-import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import javax.jms.Session;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +18,9 @@ import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.support.destination.DynamicDestinationResolver;
 import org.springframework.util.ErrorHandler;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.sqs.SqsClient;
 
 /**
  * configure JMS
@@ -39,17 +39,18 @@ public class SQSJMSConfiguration {
     private ErrorHandler errorHandler;
     
     @Autowired
-    private AWSCredentialsProvider credentialsProvider;
+    private AwsCredentialsProvider awsCredentialsProvider;
     
     @Bean
     public SQSConnectionFactory sqsConnectionFactory() {
-        AmazonSQS sqs = AmazonSQSClientBuilder.standard()
-                .withRegion(region)
-                .withCredentials(credentialsProvider)
+        Region awsRegion = Region.of(region);
+        SqsClient client = SqsClient.builder()
+                .credentialsProvider(awsCredentialsProvider)
+                .region(awsRegion)
                 .build();
         SQSConnectionFactory connectionFactory = new SQSConnectionFactory(
                 new ProviderConfiguration(),
-                sqs
+                client
         );
         return connectionFactory;
     }

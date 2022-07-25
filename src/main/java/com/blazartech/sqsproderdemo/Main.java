@@ -12,6 +12,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 
 /**
  *
@@ -34,5 +36,10 @@ public class Main {
     public AWSCredentialsProvider credentialsProvider() {
         // get credentials from ~/.aws/credentials
         return new DefaultAWSCredentialsProviderChain();
+    }
+    
+    @Bean
+    public AwsCredentialsProvider awsCredentialsProvider() {
+        return ProfileCredentialsProvider.create();
     }
 }
