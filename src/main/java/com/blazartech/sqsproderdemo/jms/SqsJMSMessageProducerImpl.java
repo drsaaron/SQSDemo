@@ -4,7 +4,6 @@
  */
 package com.blazartech.sqsproderdemo.jms;
 
-import com.blazartech.sqsproderdemo.SqsMessageProducer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
@@ -15,15 +14,16 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
+import com.blazartech.sqsproderdemo.AwsMessageProducer;
 
 /**
  *
  * @author aar1069
  */
-@Component
+@Component("sqsMessageProducer")
 @Slf4j
 @Profile("jms")
-public class SqsJMSMessageProducerImpl implements SqsMessageProducer {
+public class SqsJMSMessageProducerImpl implements AwsMessageProducer {
 
     @Autowired
     private ObjectMapper objectMapper;

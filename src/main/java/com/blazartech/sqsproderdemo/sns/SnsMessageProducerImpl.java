@@ -2,13 +2,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.blazartech.sqsproderdemo.sqs;
+package com.blazartech.sqsproderdemo.sns;
 
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.aws.messaging.core.QueueMessagingTemplate;
-import org.springframework.context.annotation.Profile;
+import org.springframework.cloud.aws.messaging.core.NotificationMessagingTemplate;
 import org.springframework.stereotype.Component;
 import com.blazartech.sqsproderdemo.AwsMessageProducer;
 
@@ -16,20 +16,16 @@ import com.blazartech.sqsproderdemo.AwsMessageProducer;
  *
  * @author aar1069
  */
-@Component("sqsMessageProducer")
+@Component("snsMessageProducer")
 @Slf4j
-@Profile("sqs")
-public class SqsMessageProducerImpl implements AwsMessageProducer {
+public class SnsMessageProducerImpl implements AwsMessageProducer {
     
-    private final QueueMessagingTemplate queueMessagingTemplate;
+    @Autowired
+    private NotificationMessagingTemplate queueMessagingTemplate;
     
-    @Value("${demo.queueName}")
-    private String queueName;
+    @Value("${demo.topicName}")
+    private String topicName;
 
-    public SqsMessageProducerImpl(QueueMessagingTemplate queueMessagingTemplate) {
-        this.queueMessagingTemplate = queueMessagingTemplate;
-    }
-    
     @Override
     public <T> void send(T message, Map<String, Object> headers) {
         if (message == null) {
@@ -38,8 +34,9 @@ public class SqsMessageProducerImpl implements AwsMessageProducer {
         }
         
         log.info("Message: {}" + message);
-        log.info("Queue name {} " + queueName);
+        log.info("Queue name {} " + topicName);
         
-        queueMessagingTemplate.convertAndSend(queueName, message, headers);
+        queueMessagingTemplate.sendNotification(topicName, message, "test");
     }
+    
 }

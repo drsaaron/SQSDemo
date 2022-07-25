@@ -21,15 +21,26 @@ public class MessageProcessorImpl implements MessageProcessor {
 
     @Autowired
     private ObjectMapper objectMapper;
-    
+
     @Value("${demo.doFail:false}")
     private boolean doFail;
-    
+
     @Override
     public void processMessage(String message) {
         try {
             log.info("received message " + message);
-            DemoMessage demoMessage = objectMapper.readValue(message, DemoMessage.class);
+
+            DemoMessage demoMessage;
+
+            if (message.contains("TopicArn")) {
+                log.info("message is a notification");
+                SNSNotification notification = objectMapper.readValue(message, SNSNotification.class);
+                log.info("notification = " + notification);
+                demoMessage = objectMapper.readValue(notification.getMessage(), DemoMessage.class);
+            } else {
+                log.info("message is a plain message");
+                demoMessage = objectMapper.readValue(message, DemoMessage.class);
+            }
 
             log.info("name = " + demoMessage.name());
 

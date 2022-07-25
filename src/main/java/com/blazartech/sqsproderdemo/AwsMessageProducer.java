@@ -10,7 +10,7 @@ import java.util.Map;
  *
  * @author aar1069
  */
-public interface SqsMessageProducer {
+public interface AwsMessageProducer {
 
     <T> void send(T message, Map<String, Object> headers);
     

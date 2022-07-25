@@ -16,25 +16,20 @@ import org.springframework.stereotype.Component;
  *
  * @author aar1069
  */
-@Slf4j
 @Component
-public class SendMessageCommandLineRunner implements CommandLineRunner {
+@Slf4j
+public class SendNotificationCommandLineRunner implements CommandLineRunner {
 
     @Autowired
-    @Qualifier("sqsMessageProducer")
+    @Qualifier("snsMessageProducer")
     private AwsMessageProducer messageProducer;
-    
+
     @Override
     public void run(String... args) throws Exception {
-        int count = 1;
-        for (String name : args) {
-            DemoMessage message = new DemoMessage(count, name, count++ % 4 == 0);
-            
-            Map<String, Object> headers = Map.of("Content-Type", MediaType.APPLICATION_JSON_VALUE);
-            
-            log.info("sending message " + message);
-            messageProducer.send(message, headers);
-        }
+        DemoMessage message = new DemoMessage(15, "temp SNS", false);
+        log.info("sending notification " + message);
+        Map<String, Object> headers = Map.of("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+        messageProducer.send(message, headers);
     }
     
 }
